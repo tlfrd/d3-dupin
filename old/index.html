@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+.border{
+  stroke-width:.3px;
+  fill:none;
+  stroke:#333;
+}
+svg {font: 10px sans-serif;}
+.caption{font-weight: bold;}
+.key path {display: none;}
+.key line{
+  stroke:#000;
+  shape-rendering:crispEdges;
+}
+
+</style>
+<body>
+<svg width="960" height="500"></svg>
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="https://d3js.org/topojson.v1.min.js"></script>
+<script>
+
+function polygonArea(points) {
+  var sum = 0.0;
+  var length = points.length;
+  if (length < 3) {
+    return sum;
+  }
+  points.forEach(function(d1, i1) {
+    i2 = (i1 + 1) % length;
+    d2 = points[i2];
+    sum += (d2[1] * d1[0]) - (d1[1] * d2[0]);
+  });
+  return sum / 2;
+}
+
+var width = 960;
+var height = 500;
+
+var formatNumber = d3.format('s');
+
+var colorArray = ['#000000', '#3f3f3f', '#7e7e7e', '#d3d3d3', 'white'];
+
+var svg = d3.select("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var color = d3.scale.threshold()
+  .domain([5, 8, 9, 20, 38])
+  .range(colorArray);
+
+// A position encoding for the key only.
+var x = d3.scale.linear()
+  .domain([0, 38])
+  .range([0, 200]);
+
+var xAxis = d3.svg.axis()
+  .scale(x)
+  .orient('bottom')
+  .tickSize(13)
+  .tickValues(color.domain())
+  .tickFormat((d) => formatNumber(d));
+
+var projection = d3.geo.albers()
+  .center([0, 49.5])
+  .rotate([-2.8, 3])
+  .parallels([45, 55])
+  .scale(2500)
+  .translate([width / 2, height / 2]);
+
+var path = d3.geo.path()
+    .projection(projection);
+
+
+d3.json("france.json", function(error1, france) {
+  d3.csv("data.csv", function(error2, illiteracy) {
+
+    if (error1) throw error1;
+    if (error2) throw error2;
+
+  var g = svg.append("g")
+      .attr("class", "key")
+      .attr("transform", "translate(40,40)");
+
+  g.selectAll("rect")
+    .data(color.range().map((currentColor) => {
+      var d = color.invertExtent(currentColor);
+      if (d[0] == null) d[0] = x.domain()[0];
+      if (d[1] == null) d[1] = x.domain()[1];
+      return d;
+    }))
+    .enter()
+    .append('rect')
+    .attr('height', 8)
+    .attr('x', (d) => x(d[0]))
+    .attr('width', (d) => x(d[1]) - x(d[0]))
+    .style('fill', (d) => color(d[0]));
+
+  g.call(xAxis).append('text')
+    .attr('class', 'caption')
+    .attr('y', -6)
+    .text('Illiteracy (%)');
+
+  svg.selectAll('.departements')
+    .data(topojson.feature(france, france.objects.regions).features)
+    .enter().append('path')
+    .attr('class', 'departements')
+    .attr('d', path)
+    .style('fill', (departement) => {
+      var paringData = illiteracy.filter((illiteracy) => {
+        return departement.properties.name === illiteracy.name;
+      })[0];
+
+      return paringData ? color(paringData.illiteracy) : color(0);
+    })
+    .on("click", function(d) {
+      if (d.geometry.type === "Polygon") {
+        var coordinates = d.geometry.coordinates[0];
+        console.log(d.properties.name + polygonArea(coordinates));
+      } else {
+        var total = 0;
+        for (var i = 0; i < d.geometry.coordinates.length; i++) {
+          total += polygonArea(d.geometry.coordinates[i][0]);
+        }
+        console.log(total);
+      }
+    });
+
+  svg.append('path')
+    .datum(topojson.mesh(france, france.objects.regions, (a, b) => { return a.properties.name !== b.properties.name || a === b; }))
+    .attr('class','border')
+    .attr('d', path);
+
+  });
+});
+
+</script>
