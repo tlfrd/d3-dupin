@@ -25,10 +25,22 @@
       <div class="text">
         Percent of audience that will likely see a difference between the two colors quickly and easily
       </div>
-      <input type="range" id="myRange" oninput="showVal(this.value)" onchange="showVal(this.value)" value="50">
-      <span id="rangeValue">50</span>
+      <input type="range" id="myRange" oninput="showVal()" onchange="showVal()" value="50">
+      <span id="rangeValue">50%</span>
+      <br/>
+      <div class="text">
+        Number of colours
+      </div>
+      <input id="colourRange" type="range" min="3" max="9" step="1" value="9" oninput="showRangeValue()"/>
+      <span id="rangeValue2">9</span>
     </div>
     <br/>
+    <div class="percentageContainer2">
+      <div class="text">
+        Average percentage of neighbors that are discriminable:
+      </div>
+      <span id="overallResult"></span>
+    </div>
 
     <div id="coloursDisplay"></div>
 

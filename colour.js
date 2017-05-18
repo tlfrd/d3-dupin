@@ -12,6 +12,45 @@ function getPolygonArea(points) {
   return sum / 2;
 }
 
+function averagePercentageDiscrim() {
+  var total = 0;
+  var count = 0;
+  for (var i in counties) {
+    var result = compareWithNeighbours(i);
+    if (result !== -1) {
+      total += result;
+      count++;
+    }
+  }
+  return total/count * 100;
+}
+
+function compareWithNeighbours(i) {
+  var thisColour = d3.select("path#c" + i).attr('fill');
+  var neighborsArray = neighbors[i];
+  var resultsArray = [neighborsArray.length];
+
+  var totalTrueFalse = 0;
+  var totalTrue = 0;
+
+  for (var i in neighborsArray) {
+    var colour = d3.select("path#c" + neighborsArray[i]).attr('fill');
+    var result = compareColours(thisColour, colour);
+    if (result === true || result == false) {
+      totalTrueFalse++;
+      if (result === true) {
+        totalTrue++;
+      }
+    }
+    resultsArray[i] = result;
+  }
+  if (totalTrue/totalTrueFalse) {
+    return totalTrue/totalTrueFalse;
+  } else {
+    return -1;
+  }
+}
+
 function displayAreaValue(d, i) {
   if (d.geometry.type === "Polygon") {
     var coordinates = d.geometry.coordinates[0];
@@ -22,14 +61,17 @@ function displayAreaValue(d, i) {
     for (var i = 0; i < d.geometry.coordinates.length; i++) {
       total += getPolygonArea(d.geometry.coordinates[i][0]);
     }
-    console.log(total);
+    // console.log(total);
   }
 }
 
 function compareColours(colour1, colour2) {
   var percentageDiscrim = document.getElementById("myRange").value / 100;
-  console.log(percentageDiscrim);
-  return d3.noticeablyDifferent(d3.rgb(colour1), d3.rgb(colour2), percentageDiscrim, 0.1);
+  if (colour1 === colour2) {
+    return "same";
+  } else {
+    return d3.noticeablyDifferent(d3.rgb(colour1), d3.rgb(colour2), percentageDiscrim, 0.1);
+  }
 }
 
 function displayColours(elementID, areaID, neighbourIDs) {
@@ -39,7 +81,7 @@ function displayColours(elementID, areaID, neighbourIDs) {
 
   var htmlToDisplay = "";
 
-  htmlToDisplay += "Clicked<br/><br/>" + generateColourHTML(thisColour, thisColour) + "<br/><br/>";
+  htmlToDisplay += "ID:" + areaID + " Clicked<br/><br/>" + generateColourHTML(thisColour, thisColour) + "<br/><br/>";
   htmlToDisplay += "Neighbours<br/><br/>";
 
   for (n in neighbourIDs) {
@@ -48,11 +90,31 @@ function displayColours(elementID, areaID, neighbourIDs) {
     htmlToDisplay += generateColourHTML(nColour, bool);
   }
 
+  htmlToDisplay += "<br/><br/> Percentage of neighbors discrim.: " + Math.round(compareWithNeighbours(areaID) * 100) + "%";
+
   displayArea.innerHTML = htmlToDisplay;
 }
 
-function showVal(value) {
-  document.getElementById("rangeValue").innerHTML = value;
+function showVal() {
+  var value = document.getElementById("myRange").value;
+  document.getElementById("rangeValue").innerHTML = value + "%";
+
+  var result = Math.round(averagePercentageDiscrim());
+  if (result) {
+    document.getElementById("overallResult").innerHTML = result + "%";
+  }
+}
+
+function showRangeValue() {
+  var value = document.getElementById("colourRange").value;
+  numberOfColours = value;
+  updateColor();
+  document.getElementById("rangeValue2").innerHTML = value;
+
+  var result = Math.round(averagePercentageDiscrim());
+  if (result) {
+    document.getElementById("overallResult").innerHTML = result + "%";
+  }
 }
 
 function clearArea(elementID) {

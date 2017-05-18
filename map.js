@@ -6,18 +6,49 @@ var unemployment = d3.map();
 
 var percentage = 0.5;
 
+var numberOfColours = 9;
+
 var counties;
 var neighbors;
 
 var path = d3.geoPath();
 
 var x = d3.scaleLinear()
-    .domain([1, 10])
+    .domain([1, 1 + numberOfColours])
     .rangeRound([600, 860]);
 
 var color = d3.scaleThreshold()
     .domain(d3.range(2, 10))
-    .range(d3.schemeBlues[9]);
+    .range(d3.schemeGreens[numberOfColours]);
+
+function updateColor() {
+  color = d3.scaleThreshold()
+      .domain(d3.range(2, 10))
+      .range(d3.schemeGreens[numberOfColours]);
+
+  x = d3.scaleLinear()
+      .domain([1, 1 + numberOfColours])
+      .rangeRound([600, 860]);
+
+  g.call(d3.axisBottom(x)
+      .tickSize(13)
+      .tickFormat(function(x, i) { return i ? x : x + "%"; })
+      .tickValues(color.domain()))
+    .select(".domain")
+      .remove();
+
+  g.selectAll("rect")
+      .attr("height", 8)
+      .attr("x", function(d) { return x(d[0]); })
+      .attr("width", function(d) { return x(d[1]) - x(d[0]); })
+      .attr("fill", function(d) { return color(d[0]); });
+
+  d3.selectAll(".counties")
+    .selectAll("path")
+    .attr("fill", function(d) {
+      return color(d.rate = unemployment.get(d.id));
+    })
+}
 
 var g = svg.append("g")
     .attr("class", "key")
@@ -76,7 +107,7 @@ function ready(error, us) {
       .attr("id", function(d, i) {
         return "c" + i;
       })
-      .on("mouseover", function(d, i) {
+      .on("click", function(d, i) {
         displayAreaValue(d, i);
       })
       .on("mouseout", function(d) {
