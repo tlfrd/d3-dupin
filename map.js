@@ -4,6 +4,9 @@ var svg = d3.select("svg"),
 
 var unemployment = d3.map();
 
+var counties;
+var neighbors;
+
 var path = d3.geoPath();
 
 var x = d3.scaleLinear()
@@ -52,27 +55,38 @@ d3.queue()
     .defer(d3.tsv, "data/unemployment.tsv", function(d) { unemployment.set(d.id, +d.rate); })
     .await(ready);
 
+
+function displayAreaValue(d, i) {
+  if (d.geometry.type === "Polygon") {
+    var coordinates = d.geometry.coordinates[0];
+    console.log(getPolygonArea(coordinates));
+    console.log(neighbors[i]);
+  } else {
+    var total = 0;
+    for (var i = 0; i < d.geometry.coordinates.length; i++) {
+      total += getPolygonArea(d.geometry.coordinates[i][0]);
+    }
+    console.log(total);
+  }
+}
+
 function ready(error, us) {
   if (error) throw error;
+
+  counties = topojson.feature(us, us.objects.counties).features;
+  neighbors = topojson.neighbors(us.objects.counties.geometries);
 
   svg.append("g")
       .attr("class", "counties")
     .selectAll("path")
-    .data(topojson.feature(us, us.objects.counties).features)
+    .data(counties)
     .enter().append("path")
-      .attr("fill", function(d) { return color(d.rate = unemployment.get(d.id)); })
+      .attr("fill", function(d) {
+        return color(d.rate = unemployment.get(d.id));
+      })
       .attr("d", path)
-      .on("click", function(d) {
-        if (d.geometry.type === "Polygon") {
-          var coordinates = d.geometry.coordinates[0];
-          console.log(getPolygonArea(coordinates));
-        } else {
-          var total = 0;
-          for (var i = 0; i < d.geometry.coordinates.length; i++) {
-            total += getPolygonArea(d.geometry.coordinates[i][0]);
-          }
-          console.log(total);
-        }
+      .on("click", function(d, i) {
+        displayAreaValue(d, i);
       })
     .append("title")
       .text(function(d) { return d.rate + "%"; });
