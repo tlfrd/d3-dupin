@@ -4,6 +4,8 @@ var svg = d3.select("svg"),
 
 var unemployment = d3.map();
 
+var percentage = 0.5;
+
 var counties;
 var neighbors;
 

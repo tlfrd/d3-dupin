@@ -21,6 +21,15 @@
     <script src="colour.js"></script>
     <script src="map.js"></script>
 
+    <div class="percentageContainer">
+      <div class="text">
+        Percent of audience that will likely see a difference between the two colors quickly and easily
+      </div>
+      <input type="range" id="myRange" oninput="showVal(this.value)" onchange="showVal(this.value)" value="50">
+      <span id="rangeValue">50</span>
+    </div>
+    <br/>
+
     <div id="coloursDisplay"></div>
 
   </body>
