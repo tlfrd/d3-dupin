@@ -85,6 +85,9 @@ function ready(error, us) {
         return color(d.rate = unemployment.get(d.id));
       })
       .attr("d", path)
+      .attr("id", function(d, i) {
+        return i;
+      })
       .on("click", function(d, i) {
         displayAreaValue(d, i);
       })
