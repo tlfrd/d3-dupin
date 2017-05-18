@@ -33,6 +33,14 @@
       </div>
       <input id="colourRange" type="range" min="3" max="9" step="1" value="9" oninput="showRangeValue()"/>
       <span id="rangeValue2">9</span>
+      <br/>
+      <select onchange="updateColor()" id="schemes">
+        <option value="blue">Blue</option>
+        <option value="green" selected="selected">Green</option>
+        <option value="orange">Orange</option>
+        <option value="purple">Purple</option>
+        <option value="red">Red</option>
+      </select>
     </div>
     <br/>
     <div class="percentageContainer2">

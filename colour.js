@@ -25,6 +25,27 @@ function averagePercentageDiscrim() {
   return total/count * 100;
 }
 
+function getColourScheme() {
+  var e = document.getElementById("schemes");
+  var scheme = e.options[e.selectedIndex].value;
+  console.log(scheme);
+
+  if (scheme === "blue") {
+    return d3.schemeBlues;
+  } else if (scheme === "green") {
+    return d3.schemeBlues;
+  } else if (scheme === "grey") {
+    return d3.schemeGreys;
+  } else if (scheme === "purple") {
+    return d3.schemePurples;
+  } else if (scheme === "orange") {
+    return d3.schemeOranges;
+  } else if (scheme === "red") {
+    return d3.schemeReds;
+  }
+  // return scheme;
+}
+
 function compareWithNeighbours(i) {
   var thisColour = d3.select("path#c" + i).attr('fill');
   var neighborsArray = neighbors[i];

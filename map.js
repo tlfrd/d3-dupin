@@ -22,9 +22,11 @@ var color = d3.scaleThreshold()
     .range(d3.schemeGreens[numberOfColours]);
 
 function updateColor() {
+  var scheme = getColourScheme();
+
   color = d3.scaleThreshold()
       .domain(d3.range(2, 10))
-      .range(d3.schemeGreens[numberOfColours]);
+      .range(scheme[numberOfColours]);
 
   x = d3.scaleLinear()
       .domain([1, 1 + numberOfColours])
@@ -47,7 +49,12 @@ function updateColor() {
     .selectAll("path")
     .attr("fill", function(d) {
       return color(d.rate = unemployment.get(d.id));
-    })
+    });
+
+    var result = Math.round(averagePercentageDiscrim());
+    if (result) {
+      document.getElementById("overallResult").innerHTML = result + "%";
+    }
 }
 
 var g = svg.append("g")
