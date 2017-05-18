@@ -56,23 +56,6 @@ d3.queue()
     .await(ready);
 
 
-function displayAreaValue(d, i) {
-  if (d.geometry.type === "Polygon") {
-    var coordinates = d.geometry.coordinates[0];
-    console.log(getPolygonArea(coordinates));
-    for (n in neighbors[i]) {
-      d3.select("path#c" + neighbors[i][n])
-        .attr("fill", "red");
-    }
-  } else {
-    var total = 0;
-    for (var i = 0; i < d.geometry.coordinates.length; i++) {
-      total += getPolygonArea(d.geometry.coordinates[i][0]);
-    }
-    console.log(total);
-  }
-}
-
 function ready(error, us) {
   if (error) throw error;
 
@@ -91,8 +74,11 @@ function ready(error, us) {
       .attr("id", function(d, i) {
         return "c" + i;
       })
-      .on("click", function(d, i) {
+      .on("mouseover", function(d, i) {
         displayAreaValue(d, i);
+      })
+      .on("mouseout", function(d) {
+        clearArea("coloursDisplay");
       })
     .append("title")
       .text(function(d) { return d.rate + "%"; });
