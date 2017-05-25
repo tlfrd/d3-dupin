@@ -1,3 +1,24 @@
+var colourSchemes = {
+  "blue": d3.schemeBlues,
+  "green": d3.schemeGreens,
+  "purple": d3.schemePurples,
+  "orange": d3.schemeOranges,
+  "red": d3.schemeReds,
+  "grey": d3.schemeGreys,
+  "bugn": d3.schemeBuGn,
+  "bupu": d3.schemeBuPu,
+  "gnbu": d3.schemeGnBu,
+  "orrd": d3.schemeOrRd,
+  "pubugn": d3.schemePuBuGn,
+  "pubu": d3.schemePuBu,
+  "purd": d3.schemePuRd,
+  "rdpu": d3.schemeRdPu,
+  "ylgnbu": d3.schemeYlGnBu,
+  "ylgn": d3.schemeYlGn,
+  "ylorbr": d3.schemeYlOrBr,
+  "ylorrd": d3.schemeYlOrRd
+}
+
 function getPolygonArea(points) {
   var sum = 0.0;
   var length = points.length;
@@ -28,22 +49,8 @@ function averagePercentageDiscrim() {
 function getColourScheme() {
   var e = document.getElementById("schemes");
   var scheme = e.options[e.selectedIndex].value;
-  console.log(scheme);
 
-  if (scheme === "blue") {
-    return d3.schemeBlues;
-  } else if (scheme === "green") {
-    return d3.schemeGreens;
-  } else if (scheme === "grey") {
-    return d3.schemeGreys;
-  } else if (scheme === "purple") {
-    return d3.schemePurples;
-  } else if (scheme === "orange") {
-    return d3.schemeOranges;
-  } else if (scheme === "red") {
-    return d3.schemeReds;
-  }
-  // return scheme;
+  return colourSchemes[scheme];
 }
 
 function compareWithNeighbours(i) {
