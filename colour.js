@@ -19,6 +19,44 @@ var colourSchemes = {
   "ylorrd": d3.schemeYlOrRd
 }
 
+var bestScore = 0;
+var bestScheme = 0;
+var bestNumber = 0;
+
+var count = 0;
+
+var colourArray = [];
+for (var j in colourSchemes) {
+  colourArray.push(j);
+}
+
+function iterateThroughAllSchemes(initColourCount, currentColourCount) {
+  if (count < colourArray.length) {
+    updateColorIter(colourSchemes[colourArray[count]], initColourCount, currentColourCount);
+  } else {
+    var best = {
+      "bestScheme": bestScheme,
+      "bestNumberOfColours": bestNumber,
+      "bestScore": bestScore
+    }
+    console.log(best);
+    console.log(results);
+  }
+}
+
+function updatePercentages() {
+  var resultNeighbours = Math.round(averagePercentageNeighbourDiscrim());
+  // var resultAll = Math.round(averagePercentageAllDiscrim());
+
+  if (resultNeighbours) {
+    document.getElementById("overallResult").innerHTML = resultNeighbours + "%";
+  }
+  //
+  // if (resultAll) {
+  //   document.getElementById("overallResultAll").innerHTML = resultAll + "%";
+  // }
+}
+
 function getPolygonArea(points) {
   var sum = 0.0;
   var length = points.length;
@@ -33,11 +71,24 @@ function getPolygonArea(points) {
   return sum / 2;
 }
 
-function averagePercentageDiscrim() {
+function averagePercentageNeighbourDiscrim() {
   var total = 0;
   var count = 0;
   for (var i in counties) {
     var result = compareWithNeighbours(i);
+    if (result !== -1) {
+      total += result;
+      count++;
+    }
+  }
+  return total/count * 100;
+}
+
+function averagePercentageAllDiscrim() {
+  var total = 0;
+  var count = 0;
+  for (var i in counties) {
+    var result = compareWithAll(i);
     if (result !== -1) {
       total += result;
       count++;
@@ -51,6 +102,34 @@ function getColourScheme() {
   var scheme = e.options[e.selectedIndex].value;
 
   return colourSchemes[scheme];
+}
+
+function compareWithAll(j) {
+  var thisColour = d3.select("path#c" + j).attr('fill');
+  var resultsArray = [counties.length - 1];
+
+  var totalTrueFalse = 0;
+  var totalTrue = 0;
+
+  for (var i in counties) {
+    if (i !== j) {
+      var colour = d3.select("path#c" + i).attr('fill');
+      var result = compareColours(thisColour, colour);
+      if (result === true || result == false) {
+        totalTrueFalse++;
+        if (result === true) {
+          totalTrue++;
+        }
+      }
+      resultsArray[i] = result;
+    }
+  }
+
+  if (totalTrue/totalTrueFalse) {
+    return totalTrue/totalTrueFalse;
+  } else {
+    return -1;
+  }
 }
 
 function compareWithNeighbours(i) {
@@ -127,22 +206,16 @@ function showVal() {
   var value = document.getElementById("myRange").value;
   document.getElementById("rangeValue").innerHTML = value + "%";
 
-  var result = Math.round(averagePercentageDiscrim());
-  if (result) {
-    document.getElementById("overallResult").innerHTML = result + "%";
-  }
+  updatePercentages();
 }
 
 function showRangeValue() {
   var value = document.getElementById("colourRange").value;
   numberOfColours = value;
-  updateColor();
+  updateColor(getColourScheme());
   document.getElementById("rangeValue2").innerHTML = value;
 
-  var result = Math.round(averagePercentageDiscrim());
-  if (result) {
-    document.getElementById("overallResult").innerHTML = result + "%";
-  }
+  updatePercentages();
 }
 
 function clearArea(elementID) {

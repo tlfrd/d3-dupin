@@ -14,6 +14,8 @@ var domainMax = 10;
 var counties;
 var neighbors;
 
+var results = [];
+
 var path = d3.geoPath();
 
 var x = d3.scaleLinear()
@@ -24,24 +26,77 @@ var color = d3.scaleThreshold()
     .domain(d3.range(2, 10))
     .range(d3.schemeBlues[numberOfColours]);
 
-function updateColor() {
-  var scheme = getColourScheme();
+function updateColor(scheme) {
+  if (!scheme) {
+    scheme = getColourScheme();
+  }
 
   color = d3.scaleThreshold()
       .domain(d3.range(domainMin, domainMax,
         (domainMax - domainMin) / (numberOfColours - 1)))
       .range(scheme[numberOfColours]);
 
+  var transitions = 0;
+
   d3.selectAll(".counties")
     .selectAll("path")
+    .transition()
     .attr("fill", function(d) {
       return color(d.rate = unemployment.get(d.id));
-    });
+    })
 
-    var result = Math.round(averagePercentageDiscrim());
-    if (result) {
-      document.getElementById("overallResult").innerHTML = result + "%";
-    }
+    updatePercentages();
+}
+
+function updateColorIter(scheme, initColourCount, currentColourCount) {
+  if (!scheme) {
+    scheme = getColourScheme();
+  }
+
+  color = d3.scaleThreshold()
+      .domain(d3.range(domainMin, domainMax,
+        (domainMax - domainMin) / (numberOfColours - 1)))
+      .range(scheme[currentColourCount]);
+
+  var transitions = 0;
+
+  d3.selectAll(".counties")
+    .selectAll("path")
+    .transition()
+    .attr("fill", function(d) {
+      return color(d.rate = unemployment.get(d.id));
+    })
+    .on("start", function() {
+      transitions++;
+    })
+    .on("end", function() {
+        if(--transitions === 0) {
+          var newScore = averagePercentageNeighbourDiscrim();
+
+          var colourResult = {
+            "scheme": colourArray[count],
+            "numberOfColours": currentColourCount,
+            "score": newScore
+          }
+
+          results.push(colourResult);
+          
+          if (newScore > bestScore) {
+            bestScore = newScore;
+            bestScheme = colourArray[count]
+            bestNumber = currentColourCount;
+          }
+
+          currentColourCount++;
+          if (currentColourCount > 9) {
+            currentColourCount = initColourCount;
+            count++;
+          }
+          numberOfColours = currentColourCount;
+
+          iterateThroughAllSchemes(initColourCount, currentColourCount);
+        }
+    });
 }
 
 d3.queue()
@@ -81,4 +136,6 @@ function ready(error, us) {
       .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
       .attr("class", "states")
       .attr("d", path);
+
+  // updatePercentages();
 }
