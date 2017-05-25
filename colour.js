@@ -33,7 +33,7 @@ function getColourScheme() {
   if (scheme === "blue") {
     return d3.schemeBlues;
   } else if (scheme === "green") {
-    return d3.schemeBlues;
+    return d3.schemeGreens;
   } else if (scheme === "grey") {
     return d3.schemeGreys;
   } else if (scheme === "purple") {
