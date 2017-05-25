@@ -30,17 +30,29 @@ for (var j in colourSchemes) {
   colourArray.push(j);
 }
 
-function iterateThroughAllSchemes(initColourCount, currentColourCount) {
+function iterateThroughAllSchemes(initColourCount, currentColourCount, allBool) {
   if (count < colourArray.length) {
-    updateColorIter(colourSchemes[colourArray[count]], initColourCount, currentColourCount);
+    updateColorIter(colourSchemes[colourArray[count]], initColourCount, currentColourCount, allBool);
   } else {
+    count = 0;
     var best = {
       "bestScheme": bestScheme,
       "bestNumberOfColours": bestNumber,
       "bestScore": bestScore
     }
+    results.push(best);
     console.log(best);
     console.log(results);
+
+    // go to best colour
+    numberOfColours = bestNumber;
+    updateColor(colourSchemes[bestScheme]);
+
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(results));
+    var dlAnchorElem = document.getElementById('downloadAnchorElem');
+    dlAnchorElem.setAttribute("href", dataStr);
+    dlAnchorElem.setAttribute("download", "results.json");
+    dlAnchorElem.click();
   }
 }
 

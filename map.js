@@ -48,7 +48,7 @@ function updateColor(scheme) {
     updatePercentages();
 }
 
-function updateColorIter(scheme, initColourCount, currentColourCount) {
+function updateColorIter(scheme, initColourCount, currentColourCount, allBool) {
   if (!scheme) {
     scheme = getColourScheme();
   }
@@ -71,7 +71,12 @@ function updateColorIter(scheme, initColourCount, currentColourCount) {
     })
     .on("end", function() {
         if(--transitions === 0) {
-          var newScore = averagePercentageNeighbourDiscrim();
+          var newScore;
+          if (allBool) {
+            newScore = averagePercentageAllDiscrim();
+          } else {
+            newScore = averagePercentageNeighbourDiscrim();
+          }
 
           var colourResult = {
             "scheme": colourArray[count],
@@ -80,7 +85,8 @@ function updateColorIter(scheme, initColourCount, currentColourCount) {
           }
 
           results.push(colourResult);
-          
+          console.log(colourResult);
+
           if (newScore > bestScore) {
             bestScore = newScore;
             bestScheme = colourArray[count]
@@ -94,7 +100,7 @@ function updateColorIter(scheme, initColourCount, currentColourCount) {
           }
           numberOfColours = currentColourCount;
 
-          iterateThroughAllSchemes(initColourCount, currentColourCount);
+          iterateThroughAllSchemes(initColourCount, currentColourCount, allBool);
         }
     });
 }
