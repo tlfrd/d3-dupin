@@ -2,28 +2,32 @@ var svg = d3.select("svg"),
     width = +svg.attr("width"),
     height = +svg.attr("height");
 
-var unemployment = d3.map();
+var population = d3.map();
 
 var percentage = 0.5;
 
 var numberOfColours = 9;
 
-var domainMin = 2;
-var domainMax = 10;
+var domainMin = 30000;
+var domainMax = 150000;
 
-var counties;
+var constituencies;
 var neighbors;
 
 var results = [];
 
-var path = d3.geoPath();
+var projection = d3.geoAlbers()
+          .rotate([0, 0]);
+
+var path = d3.geoPath().projection(projection);
 
 var x = d3.scaleLinear()
     .domain([1, 1 + numberOfColours])
     .rangeRound([600, 860]);
 
 var color = d3.scaleThreshold()
-    .domain(d3.range(2, 10))
+    .domain(d3.range(domainMin, domainMax,
+      (domainMax - domainMin) / (numberOfColours - 1)))
     .range(d3.schemeBlues[numberOfColours]);
 
 function updateColor(scheme) {
@@ -42,7 +46,7 @@ function updateColor(scheme) {
     .selectAll("path")
     .transition()
     .attr("fill", function(d) {
-      return color(d.rate = unemployment.get(d.id));
+      return color(d.rate = population.get(d.id));
     })
 
     updatePercentages();
@@ -64,7 +68,7 @@ function updateColorIter(scheme, initColourCount, currentColourCount, allBool) {
     .selectAll("path")
     .transition()
     .attr("fill", function(d) {
-      return color(d.rate = unemployment.get(d.id));
+      return color(d.rate = population.get(d.id));
     })
     .on("start", function() {
       transitions++;
@@ -106,24 +110,45 @@ function updateColorIter(scheme, initColourCount, currentColourCount, allBool) {
 }
 
 d3.queue()
-    .defer(d3.json, "https://d3js.org/us-10m.v1.json")
-    .defer(d3.tsv, "data/unemployment.tsv", function(d) { unemployment.set(d.id, +d.rate); })
+    .defer(d3.json, "https://raw.githubusercontent.com/tlfrd/viz-collection/master/uk-choro/json/uk.json")
+    .defer(d3.json, "https://raw.githubusercontent.com/tlfrd/viz-collection/master/uk-choro/json/population_ons.json")
     .await(ready);
 
 
-function ready(error, us) {
+function ready(error, uk, pop) {
   if (error) throw error;
 
-  counties = topojson.feature(us, us.objects.counties).features;
-  neighbors = topojson.neighbors(us.objects.counties.geometries);
+  console.log(uk);
+
+  for (var i in pop) {
+    population.set(i, pop[i].population);
+  }
+
+  console.log(population);
+
+  constituencies = topojson.feature(uk, uk.objects.wpc).features;
+  neighbors = topojson.neighbors(uk.objects.wpc.geometries);
+
+  projection
+    .scale(1)
+    .translate([0,0]);
+
+    // compute the correct bounds and scaling from the topoJSON
+  var b = path.bounds(topojson.feature(uk, uk.objects["wpc"]));
+  var s = .95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height);
+  var t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
+
+  projection
+      .scale(s)
+      .translate(t);
 
   svg.append("g")
       .attr("class", "counties")
     .selectAll("path")
-    .data(counties)
+    .data(constituencies)
     .enter().append("path")
       .attr("fill", function(d) {
-        return color(d.rate = unemployment.get(d.id));
+        return color(d.rate = population.get(d.id));
       })
       .attr("d", path)
       .attr("id", function(d, i) {
@@ -137,11 +162,6 @@ function ready(error, us) {
       })
     .append("title")
       .text(function(d) { return d.rate + "%"; });
-
-  svg.append("path")
-      .datum(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; }))
-      .attr("class", "states")
-      .attr("d", path);
 
   // updatePercentages();
 }

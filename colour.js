@@ -86,7 +86,7 @@ function getPolygonArea(points) {
 function averagePercentageNeighbourDiscrim() {
   var total = 0;
   var count = 0;
-  for (var i in counties) {
+  for (var i in constituencies) {
     var result = compareWithNeighbours(i);
     if (result !== -1) {
       total += result;
@@ -99,7 +99,7 @@ function averagePercentageNeighbourDiscrim() {
 function averagePercentageAllDiscrim() {
   var total = 0;
   var count = 0;
-  for (var i in counties) {
+  for (var i in constituencies) {
     var result = compareWithAll(i);
     if (result !== -1) {
       total += result;
@@ -118,12 +118,12 @@ function getColourScheme() {
 
 function compareWithAll(j) {
   var thisColour = d3.select("path#c" + j).attr('fill');
-  var resultsArray = [counties.length - 1];
+  var resultsArray = [constituencies.length - 1];
 
   var totalTrueFalse = 0;
   var totalTrue = 0;
 
-  for (var i in counties) {
+  for (var i in constituencies) {
     if (i !== j) {
       var colour = d3.select("path#c" + i).attr('fill');
       var result = compareColours(thisColour, colour);
