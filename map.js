@@ -46,7 +46,7 @@ function updateColor(scheme) {
     .selectAll("path")
     .transition()
     .attr("fill", function(d) {
-      return color(d.rate = population.get(d.id));
+      return color(d.rate = population.get(d.properties.constituency));
     })
 
     updatePercentages();
@@ -68,7 +68,7 @@ function updateColorIter(scheme, initColourCount, currentColourCount, allBool) {
     .selectAll("path")
     .transition()
     .attr("fill", function(d) {
-      return color(d.rate = population.get(d.id));
+      return color(d.rate = population.get(d.properties.constituency));
     })
     .on("start", function() {
       transitions++;
@@ -109,8 +109,11 @@ function updateColorIter(scheme, initColourCount, currentColourCount, allBool) {
     });
 }
 
+var accessor = "hexagons"
+// or "wpc"
+
 d3.queue()
-    .defer(d3.json, "https://raw.githubusercontent.com/tlfrd/viz-collection/master/uk-choro/json/uk.json")
+    .defer(d3.json, "data/uk-hex.json")
     .defer(d3.json, "https://raw.githubusercontent.com/tlfrd/viz-collection/master/uk-choro/json/population_ons.json")
     .await(ready);
 
@@ -126,15 +129,15 @@ function ready(error, uk, pop) {
 
   console.log(population);
 
-  constituencies = topojson.feature(uk, uk.objects.wpc).features;
-  neighbors = topojson.neighbors(uk.objects.wpc.geometries);
+  constituencies = topojson.feature(uk, uk.objects[accessor]).features;
+  neighbors = topojson.neighbors(uk.objects[accessor].geometries);
 
   projection
     .scale(1)
     .translate([0,0]);
 
     // compute the correct bounds and scaling from the topoJSON
-  var b = path.bounds(topojson.feature(uk, uk.objects["wpc"]));
+  var b = path.bounds(topojson.feature(uk, uk.objects[accessor]));
   var s = .95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][1]) / height);
   var t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
 
@@ -148,7 +151,8 @@ function ready(error, uk, pop) {
     .data(constituencies)
     .enter().append("path")
       .attr("fill", function(d) {
-        return color(d.rate = population.get(d.id));
+        // d.id
+        return color(d.rate = population.get(d.properties.constituency));
       })
       .attr("d", path)
       .attr("id", function(d, i) {
