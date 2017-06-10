@@ -173,14 +173,15 @@ function compareWithNeighbours(i) {
 function displayAreaValue(d, i) {
   if (d.geometry.type === "Polygon") {
     var coordinates = d.geometry.coordinates[0];
-    // console.log(getPolygonArea(coordinates));
-    displayColours('coloursDisplay', i, neighbors[i]);
+    console.log(coordinates);
+    console.log(getPolygonArea(coordinates));
+    // displayColours('coloursDisplay', i, neighbors[i]);
   } else {
     var total = 0;
     for (var i = 0; i < d.geometry.coordinates.length; i++) {
       total += getPolygonArea(d.geometry.coordinates[i][0]);
     }
-    // console.log(total);
+    console.log(total);
   }
 }
 
