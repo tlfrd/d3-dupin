@@ -7,3 +7,16 @@
   stroke: #fff;
   stroke-linejoin: round;
 }
+
+.container {
+  display: inline;
+}
+
+svg {
+  display: inline;
+}
+
+.controls {
+  float: left;
+  padding: 20px;
+}

@@ -10,64 +10,88 @@
     <![endif]-->
 
     <link rel="stylesheet" type="text/css" href="colour.css">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   </head>
 
   <body>
-    <svg width="960" height="600"></svg>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
-    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-    <script src="https://d3js.org/topojson.v2.min.js"></script>
-    <script src="https://unpkg.com/d3-jnd@0.1.1"></script>
-    <script src="colour.js"></script>
-    <script src="map.js"></script>
+    <div class="container">
+      <svg width="500" height="1000"></svg>
+      <script src="https://d3js.org/d3.v4.min.js"></script>
+      <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+      <script src="https://d3js.org/topojson.v2.min.js"></script>
+      <script src="https://unpkg.com/d3-jnd@0.1.1"></script>
+      <script src="colour.js"></script>
+      <script src="map.js"></script>
 
-    <div class="percentageContainer">
-      <div class="text">
-        Percent of audience that will likely see a difference between the two colors quickly and easily
-      </div>
-      <input type="range" id="myRange" oninput="showVal()" onchange="showVal()" value="50">
-      <span id="rangeValue">50%</span>
-      <br/>
-      <div class="text">
-        Number of colours
-      </div>
-      <input id="colourRange" type="range" min="3" max="9" step="1" value="9" oninput="showRangeValue()"/>
-      <span id="rangeValue2">9</span>
-      <br/>
-      <select onchange="updateColor()" id="schemes">
-        <option value="blue" selected="selected">Blue</option>
-        <option value="green">Green</option>
-        <option value="orange">Orange</option>
-        <option value="purple">Purple</option>
-        <option value="red">Red</option>
-        <option value="grey">Grey</option>
-        <option value="bugn">Blue-Green</option>
-        <option value="bupu">Blue-Purple</option>
-        <option value="gnbu">Green-Blue</option>
-        <option value="orrd">Orange-Red</option>
-        <option value="pubugn">Purple-Blue-Green</option>
-        <option value="pubu">Purple-Blue</option>
-        <option value="purd">Purple-Red</option>
-        <option value="rdpu">Red-Purple</option>
-        <option value="ylgnbu">Yellow-Green-Blue</option>
-        <option value="ylgn">Yellow-Green</option>
-        <option value="ylorbr">Yellow-Orange-Brown</option>
-        <option value="ylorrd">Yellow-Orange-Red</option>
-      </select>
-    </div>
-    <br/>
-    <div class="percentageContainer2">
-      <div class="text">
-        Average percentage of neighbors that are discriminable:
-      </div>
-      <span id="overallResult"></span>
-      <!-- <div class="text">
-        Average percentage of all other counties that are discriminable:
-      </div> -->
-      <span id="overallResultAll"></span>
-    </div>
+      <div class="controls">
+        <div class="panel panel-default">
+          <div class="panel-body">
+        <div class="percentageContainer">
+          <div>
+          <div class="text" style="float: left; width: 75%;">
+            <b>Percent of audience that will likely see a difference between the two colors quickly and easily</b>
+          </div>
+          <h2><span id="rangeValue" style="float: right;">50%</span></h2>
+          <br/>
+          </div>
+          <br/><br/>
+          <input type="range" id="myRange" oninput="showVal()" onchange="showVal()" value="50">
+          <br/>
+          <div>
+          <div class="text" style="float: left; width: 75%;">
+            <b>Number of colours</b>
+          </div>
+          <h1><span id="rangeValue2" style="float: right;">9</span></h1>
+          <br/>
+        </div>
+          <input id="colourRange" type="range" min="3" max="9" step="1" value="9" oninput="showRangeValue()"/>
+          <br/>
+          <b>Schemes</b>
+          <br/>
+          <br/>
+          <select onchange="updateColor()" id="schemes">
+            <option value="blue" selected="selected">Blue</option>
+            <option value="green">Green</option>
+            <option value="orange">Orange</option>
+            <option value="purple">Purple</option>
+            <option value="red">Red</option>
+            <option value="grey">Grey</option>
+            <option value="bugn">Blue-Green</option>
+            <option value="bupu">Blue-Purple</option>
+            <option value="gnbu">Green-Blue</option>
+            <option value="orrd">Orange-Red</option>
+            <option value="pubugn">Purple-Blue-Green</option>
+            <option value="pubu">Purple-Blue</option>
+            <option value="purd">Purple-Red</option>
+            <option value="rdpu">Red-Purple</option>
+            <option value="ylgnbu">Yellow-Green-Blue</option>
+            <option value="ylgn">Yellow-Green</option>
+            <option value="ylorbr">Yellow-Orange-Brown</option>
+            <option value="ylorrd">Yellow-Orange-Red</option>
+          </select>
+        </div>
+        <br/>
+        <div class="percentageContainer2">
+          <div class="text">
+            <b>Average percentage of neighbors that are discriminable:</b>
+          </div>
+          <h1><span id="overallResult"></span></h1>
+          <!-- <div class="text">
+            Average percentage of all other counties that are discriminable:
+          </div> -->
+          <span id="overallResultAll"></span>
+        </div>
 
-    <div id="coloursDisplay"></div>
+        <div id="coloursDisplay"></div>
+      </div>
+    </div>
+      </div>
+    </div>
 
     <a id="downloadAnchorElem" style="display:none"></a>
   </body>
